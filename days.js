@@ -107,8 +107,7 @@ const days = [
                 function getRating(leastCommon) {
                     var filtered = numbers.slice();
 
-                    var i = 0;
-                    while (filtered.length > 1) {
+                    for (let i = 0; filtered.length > 1; i++) {
                         let counter = 0;
                         filtered.forEach((value) => {
                             counter += value.charAt(i) == "1" ? 1 : -1;
@@ -119,8 +118,6 @@ const days = [
                         filtered = filtered.filter(
                             (value) => value.charAt(i) == desiredBit
                         );
-
-                        i++;
                     }
 
                     return parseInt(filtered[0], 2);
@@ -130,6 +127,98 @@ const days = [
                 const co2ScrubberRating = getRating(true);
 
                 return oxygenGeneratorRating * co2ScrubberRating;
+            })(),
+        ];
+    },
+
+    // day 4
+    (input) => {
+        input = input.split("\n\n");
+        const numbers = input[0].split(",").map((x) => +x);
+
+        function getBoards(input) {
+            return input
+                .slice(1)
+                .map((board) =>
+                    board
+                        .split("\n")
+                        .filter((x) => x)
+                        .map((row) => row.match(/.{1,3}/g).map((x) => +x))
+                )
+                .map((board) =>
+                    board.concat(
+                        board[0].map((_, colIndex) => board.map((row) => row[colIndex]))
+                    )
+                );
+        }
+
+        return [
+            // part 1
+            (() => {
+                const boards = getBoards(input);
+
+                for (const number of numbers) {
+                    for (const board of boards) {
+                        for (const row of board) {
+                            for (let i = 0; i < row.length; i++) {
+                                if (row[i] == number) row[i] = 0;
+                            }
+                        }
+
+                        for (const row of board) {
+                            // found the winner
+                            if (!row.reduce((acc, cur) => acc + cur, 0)) {
+                                const sum =
+                                    board.reduce(
+                                        (acc, cur) =>
+                                            acc + cur.reduce((acc, cur) => acc + cur, 0),
+                                        0
+                                    ) / 2;
+
+                                return sum * number;
+                            }
+                        }
+                    }
+                }
+            })(),
+
+            // part 2
+            (() => {
+                const boards = getBoards(input);
+
+                const winners = [];
+                let winningSum;
+                let winningNumber;
+
+                for (const number of numbers) {
+                    for (let i = 0; i < boards.length; i++) {
+                        if (winners.indexOf(i) < 0) {
+                            const board = boards[i];
+                            for (const row of board) {
+                                for (let j = 0; j < row.length; j++) {
+                                    if (row[j] == number) row[j] = 0;
+                                }
+                            }
+
+                            for (const row of board) {
+                                // found a winner
+                                if (!row.reduce((acc, cur) => acc + cur, 0)) {
+                                    winningSum =
+                                        board.reduce(
+                                            (acc, cur) =>
+                                                acc +
+                                                cur.reduce((acc, cur) => acc + cur, 0),
+                                            0
+                                        ) / 2;
+                                    winningNumber = number;
+                                    winners.push(i);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return winningSum * winningNumber;
             })(),
         ];
     },
