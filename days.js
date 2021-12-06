@@ -222,4 +222,89 @@ const days = [
             })(),
         ];
     },
+
+    // day 4
+    (input) => {
+        input = input.trim().split("\n");
+        const lines = input.map((value) => {
+            const coords = value
+                .split(" -> ")
+                .reduce((acc, cur) => acc.concat(cur.split(",")), [])
+                .map((x) => +x);
+
+            return {
+                x1: coords[0],
+                y1: coords[1],
+                x2: coords[2],
+                y2: coords[3],
+            };
+        });
+
+        const maxX = lines.reduce(
+            (acc, cur) => Math.max(acc, Math.max(cur.x1, cur.x2)),
+            0
+        );
+        const maxY = lines.reduce(
+            (acc, cur) => Math.max(acc, Math.max(cur.y1, cur.y2)),
+            0
+        );
+
+        return [
+            // part 1
+            (() => {
+                const points = Array(maxY + 1)
+                    .fill(0)
+                    .map((x) => Array(maxX + 1).fill(0));
+
+                for (const line of lines) {
+                    if (line.x1 == line.x2) {
+                        for (let i = 0; i <= Math.abs(line.y2 - line.y1); i++) {
+                            points[line.y1 + i * Math.sign(line.y2 - line.y1)][line.x1]++;
+                        }
+                    } else if (line.y1 == line.y2) {
+                        for (let i = 0; i <= Math.abs(line.x2 - line.x1); i++) {
+                            points[line.y1][line.x1 + i * Math.sign(line.x2 - line.x1)]++;
+                        }
+                    }
+                }
+
+                return points.reduce(
+                    (acc, cur) =>
+                        acc + cur.reduce((acc, cur) => acc + (cur > 1 ? 1 : 0), 0),
+                    0
+                );
+            })(),
+
+            // part 2
+            (() => {
+                const points = Array(maxY + 1)
+                    .fill(0)
+                    .map((x) => Array(maxX + 1).fill(0));
+
+                for (const line of lines) {
+                    if (line.x1 == line.x2) {
+                        for (let i = 0; i <= Math.abs(line.y2 - line.y1); i++) {
+                            points[line.y1 + i * Math.sign(line.y2 - line.y1)][line.x1]++;
+                        }
+                    } else if (line.y1 == line.y2) {
+                        for (let i = 0; i <= Math.abs(line.x2 - line.x1); i++) {
+                            points[line.y1][line.x1 + i * Math.sign(line.x2 - line.x1)]++;
+                        }
+                    } else {
+                        for (let i = 0; i <= Math.abs(line.x2 - line.x1); i++) {
+                            points[line.y1 + i * Math.sign(line.y2 - line.y1)][
+                                line.x1 + i * Math.sign(line.x2 - line.x1)
+                            ]++;
+                        }
+                    }
+                }
+
+                return points.reduce(
+                    (acc, cur) =>
+                        acc + cur.reduce((acc, cur) => acc + (cur > 1 ? 1 : 0), 0),
+                    0
+                );
+            })(),
+        ];
+    },
 ];
