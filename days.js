@@ -348,4 +348,57 @@ const days = [
             })(),
         ];
     },
+
+    // day 7
+    (input) => {
+        let positions = input.split(",").map((x) => +x);
+
+        const minX = positions.reduce(
+            (acc, cur) => Math.min(acc, Math.min(cur, cur)),
+            Number.POSITIVE_INFINITY
+        );
+        const maxX = positions.reduce((acc, cur) => Math.max(acc, Math.max(cur, cur)), 0);
+
+        return [
+            // part 1
+            (() => {
+                let bestX;
+                let bestFuel = Number.POSITIVE_INFINITY;
+
+                for (let x = minX; x <= maxX; x++) {
+                    const fuel = positions.reduce(
+                        (acc, cur) => acc + Math.abs(cur - x),
+                        0
+                    );
+
+                    if (fuel < bestFuel) {
+                        bestFuel = fuel;
+                        bestX = x;
+                    }
+                }
+
+                return bestFuel;
+            })(),
+
+            // part 2
+            (() => {
+                let bestX;
+                let bestFuel = Number.POSITIVE_INFINITY;
+
+                for (let x = minX; x <= maxX; x++) {
+                    const fuel = positions.reduce((acc, cur) => {
+                        const n = Math.abs(cur - x);
+                        return acc + (n * (n + 1)) / 2;
+                    }, 0);
+
+                    if (fuel < bestFuel) {
+                        bestFuel = fuel;
+                        bestX = x;
+                    }
+                }
+
+                return bestFuel;
+            })(),
+        ];
+    },
 ];
