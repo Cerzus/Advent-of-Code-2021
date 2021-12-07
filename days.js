@@ -307,4 +307,45 @@ const days = [
             })(),
         ];
     },
+
+    // day 6
+    (input) => {
+        return [
+            // part 1
+            (() => {
+                let timers = input.split(",").map((x) => +x);
+
+                for (let i = 0; i < 80; i++) {
+                    for (let j = 0, len = timers.length; j < len; j++) {
+                        if (!timers[j]) {
+                            timers.push(8);
+                            timers[j] = 6;
+                        } else timers[j]--;
+                    }
+                }
+
+                return timers.length;
+            })(),
+
+            // part 2
+            (() => {
+                let timers = input
+                    .split(",")
+                    .map((x) => +x)
+                    .reduce((acc, cur) => {
+                        acc[cur]++;
+                        return acc;
+                    }, Array(9).fill(0));
+
+                for (let i = 0; i < 256; i++) {
+                    const numberToCreate = timers.shift();
+
+                    timers[6] += numberToCreate;
+                    timers.push(numberToCreate);
+                }
+
+                return timers.reduce((acc, cur) => acc + cur, 0);
+            })(),
+        ];
+    },
 ];
