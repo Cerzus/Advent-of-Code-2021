@@ -401,4 +401,138 @@ const days = [
             })(),
         ];
     },
+
+    // day 8
+    (input) => {
+        return [
+            // part 1
+            (() => {
+                const lengths = [2, 3, 4, 7];
+
+                return input
+                    .trim()
+                    .split("\n")
+                    .reduce(
+                        (acc, cur) =>
+                            acc +
+                            cur
+                                .trim()
+                                .split(" | ")[1]
+                                .split(" ")
+                                .reduce(
+                                    (acc, cur) =>
+                                        acc + (lengths.indexOf(cur.length) >= 0 ? 1 : 0),
+                                    0
+                                ),
+                        0
+                    );
+            })(),
+
+            // part 2
+            (() => {
+                String.prototype.replaceAt = function (index, replacement) {
+                    return this.substr(0, index) + replacement + this.substr(index + 1);
+                };
+
+                return input
+                    .trim()
+                    .split("\n")
+                    .reduce((acc, cur) => {
+                        let [signalPatterns, digits] = cur
+                            .trim()
+                            .split(" | ")
+                            .map((x) =>
+                                x.split(" ").map((x) => x.split("").sort().join(""))
+                            );
+
+                        signalPatterns = signalPatterns
+                            .sort((a, b) => a.length - b.length)
+                            .map((x) => x.split(""));
+
+                        // determine 1, 4, 7 and 8
+                        const numberIndexes = Array(10);
+                        numberIndexes[1] = 0;
+                        numberIndexes[7] = 1;
+                        numberIndexes[4] = 2;
+                        numberIndexes[8] = 9;
+
+                        // determine segments with two possibilities
+                        const segments2And5 = signalPatterns[1].filter((x) =>
+                            signalPatterns[0].includes(x)
+                        );
+                        const segments1And3 = signalPatterns[2].filter(
+                            (x) => !signalPatterns[0].includes(x)
+                        );
+                        const segments4And6 = signalPatterns[9].filter(
+                            (x) =>
+                                !signalPatterns[1].includes(x) &
+                                !signalPatterns[2].includes(x)
+                        );
+
+                        // determine 2, 3 and 5
+                        for (let i of [3, 4, 5]) {
+                            if (
+                                signalPatterns[i].filter((x) => segments4And6.includes(x))
+                                    .length == 2
+                            ) {
+                                numberIndexes[2] = i;
+                            }
+
+                            if (
+                                signalPatterns[i].filter((x) => segments2And5.includes(x))
+                                    .length == 2
+                            ) {
+                                numberIndexes[3] = i;
+                            }
+
+                            if (
+                                signalPatterns[i].filter((x) => segments1And3.includes(x))
+                                    .length == 2
+                            ) {
+                                numberIndexes[5] = i;
+                            }
+                        }
+
+                        // determine 0, 6 and 9
+                        for (let i of [6, 7, 8]) {
+                            if (
+                                signalPatterns[i].filter((x) => segments1And3.includes(x))
+                                    .length == 1
+                            ) {
+                                numberIndexes[0] = i;
+                            }
+
+                            if (
+                                signalPatterns[i].filter((x) => segments2And5.includes(x))
+                                    .length == 1
+                            ) {
+                                numberIndexes[6] = i;
+                            }
+
+                            if (
+                                signalPatterns[i].filter((x) => segments4And6.includes(x))
+                                    .length == 1
+                            ) {
+                                numberIndexes[9] = i;
+                            }
+                        }
+
+                        const signalPatternsInOrder = numberIndexes.map((x) =>
+                            signalPatterns[x].join("")
+                        );
+
+                        return (
+                            acc +
+                            digits.reduce((acc, cur) => {
+                                for (let i = 0; i < 10; i++) {
+                                    if (cur == signalPatternsInOrder[i]) {
+                                        return 10 * acc + i;
+                                    }
+                                }
+                            }, 0)
+                        );
+                    }, 0);
+            })(),
+        ];
+    },
 ];

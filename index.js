@@ -15,15 +15,18 @@ days.forEach((value, index) => {
             input.push(data);
 
             if (!--daysToLoad) {
-                // everything loaded
+                select.value = select.children.length - 2;
+                loadSolutions();
             }
         });
 });
 
-select.oninput = (value) => {
+function loadSolutions() {
     const solutions = days[select.value](input[select.value]);
 
     for (let i = 0; i < 2; i++) {
         document.getElementById("solution-part-" + (i + 1)).innerHTML = solutions[i];
     }
-};
+}
+
+select.oninput = loadSolutions;
