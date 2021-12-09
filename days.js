@@ -353,16 +353,12 @@ const days = [
     (input) => {
         let positions = input.split(",").map((x) => +x);
 
-        const minX = positions.reduce(
-            (acc, cur) => Math.min(acc, cur),
-            Number.POSITIVE_INFINITY
-        );
-        const maxX = positions.reduce((acc, cur) => Math.max(acc, cur), 0);
+        const minX = Math.min(...positions);
+        const maxX = Math.max(...positions);
 
         return [
             // part 1
             (() => {
-                let bestX;
                 let bestFuel = Number.POSITIVE_INFINITY;
 
                 for (let x = minX; x <= maxX; x++) {
@@ -373,7 +369,6 @@ const days = [
 
                     if (fuel < bestFuel) {
                         bestFuel = fuel;
-                        bestX = x;
                     }
                 }
 
@@ -382,7 +377,6 @@ const days = [
 
             // part 2
             (() => {
-                let bestX;
                 let bestFuel = Number.POSITIVE_INFINITY;
 
                 for (let x = minX; x <= maxX; x++) {
@@ -391,10 +385,7 @@ const days = [
                         return acc + (n * (n + 1)) / 2;
                     }, 0);
 
-                    if (fuel < bestFuel) {
-                        bestFuel = fuel;
-                        bestX = x;
-                    }
+                    if (fuel < bestFuel) bestFuel = fuel;
                 }
 
                 return bestFuel;
@@ -526,6 +517,87 @@ const days = [
                             )
                         );
                     }, 0);
+            })(),
+        ];
+    },
+
+    // day 9
+    (input) => {
+        const points = input
+            .trim()
+            .split("\n")
+            .map((x) => x.split("").map((x) => +x));
+
+        return [
+            // part 1
+            (() => {
+                let sum = 0;
+
+                for (let y = 0; y < points.length; y++) {
+                    for (let x = 0; x < points[y].length; x++) {
+                        const point = points[y][x];
+
+                        if (
+                            (x == 0 || point < points[y][x - 1]) &&
+                            (x == points[y].length - 1 || point < points[y][x + 1]) &&
+                            (y == 0 || point < points[y - 1][x]) &&
+                            (y == points.length - 1 || point < points[y + 1][x])
+                        ) {
+                            sum += point + 1;
+                        }
+                    }
+                }
+
+                return sum;
+            })(),
+
+            // part 2
+            (() => {
+                const touchedPoints = points.map((y) => y.map((x) => false));
+
+                function basinFloodFill(x, y) {
+                    if (
+                        y < 0 ||
+                        y >= points.length ||
+                        x < 0 ||
+                        x >= points[y].length ||
+                        touchedPoints[y][x] ||
+                        points[y][x] == 9
+                    ) {
+                        return 0;
+                    }
+
+                    touchedPoints[y][x] = true;
+
+                    return (
+                        1 +
+                        basinFloodFill(x - 1, y) +
+                        basinFloodFill(x + 1, y) +
+                        basinFloodFill(x, y - 1) +
+                        basinFloodFill(x, y + 1)
+                    );
+                }
+
+                const basinSizes = [];
+
+                for (let y = 0; y < points.length; y++) {
+                    for (let x = 0; x < points[y].length; x++) {
+                        const point = points[y][x];
+
+                        if (
+                            (x == 0 || point < points[y][x - 1]) &&
+                            (x == points[y].length - 1 || point < points[y][x + 1]) &&
+                            (y == 0 || point < points[y - 1][x]) &&
+                            (y == points.length - 1 || point < points[y + 1][x])
+                        ) {
+                            basinSizes.push(basinFloodFill(x, y));
+                        }
+                    }
+                }
+
+                const largestBasinSizes = basinSizes.sort((a, b) => b - a).slice(0, 3);
+
+                return largestBasinSizes[0] * largestBasinSizes[1] * largestBasinSizes[2];
             })(),
         ];
     },
