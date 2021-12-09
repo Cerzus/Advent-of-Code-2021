@@ -354,10 +354,10 @@ const days = [
         let positions = input.split(",").map((x) => +x);
 
         const minX = positions.reduce(
-            (acc, cur) => Math.min(acc, Math.min(cur, cur)),
+            (acc, cur) => Math.min(acc, cur),
             Number.POSITIVE_INFINITY
         );
-        const maxX = positions.reduce((acc, cur) => Math.max(acc, Math.max(cur, cur)), 0);
+        const maxX = positions.reduce((acc, cur) => Math.max(acc, cur), 0);
 
         return [
             // part 1
@@ -430,10 +430,6 @@ const days = [
 
             // part 2
             (() => {
-                String.prototype.replaceAt = function (index, replacement) {
-                    return this.substr(0, index) + replacement + this.substr(index + 1);
-                };
-
                 return input
                     .trim()
                     .split("\n")
@@ -452,8 +448,8 @@ const days = [
                         // determine 1, 4, 7 and 8
                         const numberIndexes = Array(10);
                         numberIndexes[1] = 0;
-                        numberIndexes[7] = 1;
                         numberIndexes[4] = 2;
+                        numberIndexes[7] = 1;
                         numberIndexes[8] = 9;
 
                         // determine segments with two possibilities
@@ -523,13 +519,11 @@ const days = [
 
                         return (
                             acc +
-                            digits.reduce((acc, cur) => {
-                                for (let i = 0; i < 10; i++) {
-                                    if (cur == signalPatternsInOrder[i]) {
-                                        return 10 * acc + i;
-                                    }
-                                }
-                            }, 0)
+                            digits.reduce(
+                                (acc, cur) =>
+                                    10 * acc + signalPatternsInOrder.indexOf(cur),
+                                0
+                            )
                         );
                     }, 0);
             })(),
