@@ -601,4 +601,70 @@ const days = [
             })(),
         ];
     },
+
+    // day 10
+    (input) => {
+        // input =
+        //     "[({(<(())[]>[[{[]{<()<>>\n[(()[<>])]({[<{<<[]>>(\n{([(<{}[<>[]}>{[]{[(<()>\n(((({<>}<{<{<>}{[]{[]{}\n[[<[([]))<([[{}[[()]]]\n[{[{({}]{}}([{[{{{}}([]\n{<[[]]>}<{[{[{[]{()[[[]\n[<(<(<(<{}))><([]([]()\n<{([([[(<>()){}]>(<<{{\n<{([{{}}[<[[[<>{}]]]>[]]";
+        const lines = input.trim().split("\n");
+
+        return [
+            // part 1
+            (() => {
+                let syntaxErrorScore = 0;
+
+                for (const line of lines) {
+                    const stack = [];
+
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line.charAt(i);
+                        const openIndex = ["(", "[", "{", "<"].indexOf(char);
+
+                        if (openIndex >= 0) {
+                            stack.push(openIndex);
+                        } else {
+                            const closeIndex = [")", "]", "}", ">"].indexOf(char);
+                            if (closeIndex != stack.pop()) {
+                                syntaxErrorScore += [3, 57, 1197, 25137][closeIndex];
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return syntaxErrorScore;
+            })(),
+
+            // part 2
+            (() => {
+                const scores = lines
+                    .reduce((acc, line) => {
+                        const stack = [];
+
+                        for (let j = 0; j < line.length; j++) {
+                            const char = line.charAt(j);
+                            const openIndex = ["(", "[", "{", "<"].indexOf(char);
+
+                            if (openIndex >= 0) {
+                                stack.unshift(openIndex);
+                            } else {
+                                const closeIndex = [")", "]", "}", ">"].indexOf(char);
+                                if (closeIndex != stack.shift()) return acc;
+                            }
+                        }
+
+                        acc.push(
+                            stack.reduce((acc, cur) => {
+                                return acc * 5 + cur + 1;
+                            }, 0)
+                        );
+
+                        return acc;
+                    }, [])
+                    .sort((a, b) => a - b);
+
+                return scores[(scores.length - 1) / 2];
+            })(),
+        ];
+    },
 ];
