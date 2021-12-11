@@ -667,4 +667,81 @@ const days = [
             })(),
         ];
     },
+
+    // day 11
+    (input) => {
+        // input =
+        //     "5483143223\n2745854711\n5264556173\n6141336146\n6357385478\n4167524645\n2176841721\n6882881134\n4846848554\n5283751526";
+        const startingEnergyLevels = input
+            .trim()
+            .split("\n")
+            .map((x) => x.split("").map((x) => +x));
+
+        function increaseEnergyLevel(energyLevels, x, y) {
+            energyLevels[y][x]++;
+
+            if (energyLevels[y][x] == 10) {
+                for (let i = Math.max(0, y - 1); i <= Math.min(y + 1, 9); i++) {
+                    for (let j = Math.max(0, x - 1); j <= Math.min(x + 1, 9); j++) {
+                        if (x != j || y != i) {
+                            increaseEnergyLevel(energyLevels, j, i);
+                        }
+                    }
+                }
+            }
+        }
+
+        return [
+            // part 1
+            (() => {
+                const energyLevels = startingEnergyLevels.map((x) => x.slice());
+                let count = 0;
+
+                for (let i = 0; i < 100; i++) {
+                    for (let y = 0; y < 10; y++) {
+                        for (let x = 0; x < 10; x++) {
+                            increaseEnergyLevel(energyLevels, x, y);
+                        }
+                    }
+
+                    for (let y = 0; y < 10; y++) {
+                        for (let x = 0; x < 10; x++) {
+                            if (energyLevels[y][x] > 9) {
+                                energyLevels[y][x] = 0;
+                                count++;
+                            }
+                        }
+                    }
+                }
+
+                return count;
+            })(),
+
+            // part 2
+            (() => {
+                const energyLevels = startingEnergyLevels.map((x) => x.slice());
+
+                for (let i = 0; ; i++) {
+                    let count = 0;
+
+                    for (let y = 0; y < 10; y++) {
+                        for (let x = 0; x < 10; x++) {
+                            increaseEnergyLevel(energyLevels, x, y);
+                        }
+                    }
+
+                    for (let y = 0; y < 10; y++) {
+                        for (let x = 0; x < 10; x++) {
+                            if (energyLevels[y][x] > 9) {
+                                energyLevels[y][x] = 0;
+                                count++;
+                            }
+                        }
+                    }
+
+                    if (count == 100) return i + 1;
+                }
+            })(),
+        ];
+    },
 ];
