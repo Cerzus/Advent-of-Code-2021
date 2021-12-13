@@ -826,4 +826,80 @@ const days = [
             })(),
         ];
     },
+
+    // day 13
+    (input) => {
+        const [input1, input2] = input.trim().split("\n\n");
+        const dots = input1.split("\n").map((x) => x.split(",").map((x) => +x));
+        const folds = input2.split("\n").map((x) => x.substring(11).split("="));
+
+        return [
+            // part 1
+            (() => {
+                const foldAlongX = folds[0][0] == "x";
+                const foldCoordinate = +folds[0][1];
+
+                return dots.reduce((acc, cur) => {
+                    let [x, y] = cur;
+
+                    if (foldAlongX) {
+                        x -= 2 * Math.max(0, x - foldCoordinate);
+                    } else {
+                        y -= 2 * Math.max(0, y - foldCoordinate);
+                    }
+
+                    const coordinates = [x, y].join(",");
+
+                    if (acc.indexOf(coordinates) < 0) acc.push(coordinates);
+
+                    return acc;
+                }, []).length;
+            })(),
+
+            // part 2
+            (() => {
+                const foo = dots.reduce((acc, cur) => {
+                    let [x, y] = cur;
+
+                    for (const fold of folds) {
+                        const foldAlongX = fold[0] == "x";
+                        const foldCoordinate = +fold[1];
+
+                        if (foldAlongX) {
+                            x -= 2 * Math.max(0, x - foldCoordinate);
+                        } else {
+                            y -= 2 * Math.max(0, y - foldCoordinate);
+                        }
+                    }
+
+                    acc.push([x, y]);
+
+                    return acc;
+                }, []);
+
+                const [maxX, maxY] = foo.reduce(
+                    (acc, cur) => [Math.max(acc[0], cur[0]), Math.max(acc[1], cur[1])],
+                    [0, 0]
+                );
+
+                const code = Array(maxY + 1)
+                    .fill()
+                    .map((x) => Array(maxX + 1).fill(false));
+
+                for (const coordinate of foo) {
+                    const [x, y] = coordinate;
+
+                    code[y][x] = true;
+                }
+
+                return (
+                    "<p style='font-family:monospace'>" +
+                    code
+                        .map((x) => x.map((x) => (x ? "X" : "&nbsp;")).join(""))
+                        .join("<br>") +
+                    "</p>"
+                );
+            })(),
+        ];
+    },
 ];
