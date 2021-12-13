@@ -744,4 +744,86 @@ const days = [
             })(),
         ];
     },
+
+    // day 12
+    (input) => {
+        const connections = input
+            .trim()
+            .split("\n")
+            .map((x) => x.split("-"));
+
+        const graph = connections.reduce((acc, cur) => {
+            for (let i = 0; i < 2; i++) {
+                if (!acc.hasOwnProperty(cur[i])) acc[cur[i]] = [];
+                acc[cur[i]].push(cur[1 - i]);
+            }
+
+            return acc;
+        }, {});
+
+        return [
+            // part 1
+            (() => {
+                const paths = [];
+
+                function findPaths(node, path) {
+                    path.push(node);
+                    if (node == "end") {
+                        paths.push(path.slice());
+                    } else {
+                        for (const next of graph[node]) {
+                            if (
+                                path.indexOf(next) < 0 ||
+                                next.charAt(0) != next.charAt(0).toLowerCase()
+                            ) {
+                                findPaths(next, path.slice());
+                            }
+                        }
+                    }
+                }
+
+                findPaths("start", [], paths);
+
+                return paths.length;
+            })(),
+
+            // part 2
+            (() => {
+                const paths = [];
+
+                function findPaths(node, path, doubleSmallCaves) {
+                    path.push(node);
+                    if (node == "end") {
+                        paths.push(path.slice());
+                    } else {
+                        for (const next of graph[node]) {
+                            if (
+                                next == "end" ||
+                                next.charAt(0) != next.charAt(0).toLowerCase()
+                            ) {
+                                findPaths(next, path.slice(), doubleSmallCaves);
+                            } else if (next != "start") {
+                                let count = 1;
+                                for (const prev of path) {
+                                    if (prev == next) count++;
+                                }
+
+                                if (count <= 2 - (doubleSmallCaves ? 1 : 0)) {
+                                    findPaths(
+                                        next,
+                                        path.slice(),
+                                        doubleSmallCaves || count == 2
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+
+                findPaths("start", [], false);
+
+                return paths.length;
+            })(),
+        ];
+    },
 ];
