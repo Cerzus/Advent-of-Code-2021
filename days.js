@@ -902,4 +902,101 @@ const days = [
             })(),
         ];
     },
+
+    // day 14
+    (input) => {
+        const [input1, input2] = input.trim().split("\n\n");
+
+        const rules = input2
+            .split("\n")
+            .map((x) => x.split(" -> "))
+            .reduce((acc, cur) => {
+                acc[cur[0]] = cur[1];
+                return acc;
+            }, {});
+
+        return [
+            // part 1
+            (() => {
+                let polymerTemplate = input1.split("");
+
+                for (let i = 0; i < 10; i++) {
+                    polymerTemplate = polymerTemplate
+                        .reduce((acc, cur, i, arr) => {
+                            if (i) acc.push(arr[i - 1] + cur);
+                            return acc;
+                        }, [])
+                        .reduce((acc, cur, i) => {
+                            if (!i) acc.push(cur.charAt(0));
+                            if (rules.hasOwnProperty(cur)) acc.push(rules[cur]);
+                            acc.push(cur.charAt(1));
+                            return acc;
+                        }, []);
+                }
+
+                const occurrences = Object.entries(
+                    polymerTemplate.reduce((acc, cur) => {
+                        if (!acc.hasOwnProperty(cur)) acc[cur] = 1;
+                        else acc[cur]++;
+                        return acc;
+                    }, {})
+                ).reduce((acc, cur) => acc.concat([cur[1]]), []);
+
+                return Math.max(...occurrences) - Math.min(...occurrences);
+            })(),
+
+            // part 2
+            (() => {
+                let pairs = input1
+                    .split("")
+                    .reduce((acc, cur, i, arr) => {
+                        if (i) acc.push(arr[i - 1] + cur);
+                        return acc;
+                    }, [])
+                    .reduce((acc, cur) => {
+                        if (!acc.hasOwnProperty(cur)) acc[cur] = 1;
+                        else acc[cur]++;
+                        return acc;
+                    }, {});
+
+                for (let i = 0; i < 40; i++) {
+                    pairs = Object.entries(pairs).reduce((acc, cur) => {
+                        if (rules.hasOwnProperty(cur[0])) {
+                            const firstPair = cur[0].charAt(0) + rules[cur[0]];
+                            const secondPair = rules[cur[0]] + cur[0].charAt(1);
+
+                            if (!acc.hasOwnProperty(firstPair)) acc[firstPair] = 0;
+                            acc[firstPair] += cur[1];
+
+                            if (!acc.hasOwnProperty(secondPair)) acc[secondPair] = 0;
+                            acc[secondPair] += cur[1];
+                        } else {
+                            acc[cur[0]] = cur[1];
+                        }
+
+                        return acc;
+                    }, {});
+                }
+
+                let occurrences = Object.entries(pairs).reduce((acc, cur) => {
+                    const char = cur[0].charAt(1);
+                    if (!acc.hasOwnProperty(char)) acc[char] = 0;
+                    acc[char] += cur[1];
+
+                    return acc;
+                }, {});
+
+                const char = input1.charAt(0);
+                if (!occurrences.hasOwnProperty(char)) occurrences[char] = 1;
+                occurrences[char]++;
+
+                occurrences = Object.entries(occurrences).reduce(
+                    (acc, cur) => acc.concat([cur[1]]),
+                    []
+                );
+
+                return Math.max(...occurrences) - Math.min(...occurrences);
+            })(),
+        ];
+    },
 ];
