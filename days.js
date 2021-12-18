@@ -999,4 +999,112 @@ const days = [
             })(),
         ];
     },
+
+    // day 15
+    (input) => {
+        // comment out to use actual input. Warning: takes a few minutes for part two.
+        input =
+            "1163751742\n1381373672\n2136511328\n3694931569\n7463417111\n1319128137\n1359912421\n3125421639\n1293138521\n2311944581";
+
+        function lowestRisk(map) {
+            const unvisited = map.reduce(
+                (acc, cur, y) =>
+                    acc.concat(
+                        cur.reduce((acc, _, x) => acc.concat([[x, y]]), []),
+                        []
+                    ),
+                []
+            );
+
+            const distances = Array(map.length)
+                .fill()
+                .map(() => Array(map[0].length).fill(Infinity));
+            distances[0][0] = 0;
+
+            const deltaX = [0, 1, 0, -1];
+            const deltaY = [1, 0, -1, 0];
+
+            const width = map[0].length;
+            const height = map.length;
+
+            let foo = 0;
+
+            while (unvisited.length) {
+                let currentX, currentY;
+                let currentDistance = Infinity;
+                let index;
+
+                for (let i = 0; i < unvisited.length; i++) {
+                    const node = unvisited[i];
+
+                    const [x, y] = node;
+                    if (distances[y][x] < currentDistance) {
+                        currentDistance = distances[y][x];
+                        currentX = x;
+                        currentY = y;
+                        index = i;
+                    }
+                }
+
+                for (let i = 0; i < 4; i++) {
+                    const x = currentX + deltaX[i];
+                    const y = currentY + deltaY[i];
+
+                    if (x < 0 || y < 0 || x >= width || y >= height) continue;
+
+                    distances[y][x] = Math.min(
+                        currentDistance + map[y][x],
+                        distances[y][x]
+                    );
+                }
+
+                unvisited.splice(index, 1);
+
+                if (foo++ == 999) {
+                    foo = 0;
+                    console.log(unvisited.length);
+                }
+            }
+
+            return distances[map.length - 1][map[0].length - 1];
+        }
+
+        return [
+            // part 1
+            (() => {
+                const map = input
+                    .trim()
+                    .split("\n")
+                    .map((x) => x.split("").map((x) => +x));
+
+                return lowestRisk(map);
+            })(),
+
+            // part 2
+            (() => {
+                const map = input
+                    .trim()
+                    .split("\n")
+                    .map((x) => x.split("").map((x) => +x))
+                    .reduce((acc, cur, y, arr) => {
+                        for (let i = 0; i < 5; i++) {
+                            acc[y + i * arr.length] = Array(cur.length * 5);
+                        }
+
+                        cur.forEach((risk, x) => {
+                            for (let i = 0; i < 5; i++) {
+                                for (let j = 0; j < 5; j++) {
+                                    acc[y + i * arr.length][x + j * cur.length] =
+                                        ((risk - 1 + i + j) % 9) + 1;
+                                }
+                            }
+                        });
+
+                        return acc;
+                    }, Array(input.trim().split("\n").length * 5));
+
+                return lowestRisk(map);
+            })(),
+        ];
+    },
 ];
